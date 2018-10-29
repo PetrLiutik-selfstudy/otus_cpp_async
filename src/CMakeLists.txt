@@ -11,7 +11,8 @@ find_package (Threads REQUIRED)
 file(GLOB_RECURSE SOURCES *.cpp *.h)
 
 # Setup application
-add_executable(${PROJECT_NAME} ${SOURCES})
+#add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
@@ -30,7 +31,10 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(FILES async.h DESTINATION include)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
