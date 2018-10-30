@@ -1,67 +1,40 @@
 ﻿#include "CmdProcessor.h"
-
-#include <algorithm>
-#include <istream>
-
-#include <iostream>
-
-#include <thread>
+#include "ConsoleWriter.h"
+#include "FileWriter.h"
 
 namespace bulk {
 
-void CmdProcessor::subscribe(const std::shared_ptr<IStreamWriter>& observer) {
-  auto it = std::find_if(observers_.begin(), observers_.end(), [&observer](observer_t& p) {
-      return p.lock() == observer;
-  });
-  if(it == observers_.end())
-    observers_.emplace_back(observer);
+async::handle_t CmdProcessor::create_context(size_t bulk_size) {
+  auto context = std::make_shared<CmdProcessContext>(bulk_size);
+  auto handle = reinterpret_cast<async::handle_t>(context.get());
+
+  auto console_writer = std::make_shared<bulk::ConsoleWriter>();
+  auto file_writer = std::make_shared<bulk::FileWriter>();
+
+  context->subscribe(console_writer);
+  context->subscribe(file_writer);
+
+  console_writer->start();
+  file_writer->start();
+
+  std::unique_lock<std::mutex> lock(contexts_mutex_);
+  contexts_.emplace(std::make_pair(handle, context));
+
+  return handle;
 }
 
-void CmdProcessor::unsubscribe(const std::shared_ptr<IStreamWriter>& observer) {
-  auto it = std::find_if(observers_.begin(), observers_.end(), [&observer](observer_t& p) {
-    return p.lock() == observer;
-  });
-  if(it != observers_.end())
-    observers_.erase(it);
+void CmdProcessor::destroy_context(const async::handle_t& handle) {
+  std::unique_lock<std::mutex> lock(contexts_mutex_);
+  auto it = contexts_.find(handle);
+  if(it != contexts_.cend())
+    contexts_.erase(it);
 }
 
-void CmdProcessor::process(std::istream& is) {
-  size_t rows{};
-  for(bool is_eof = false; !is_eof;) {
-    std::string input;
-    is_eof = !std::getline(is, input);
-    if(!is_eof)
-      rows++;
-
-    std::string cmd;
-    bool is_bulk_end = interpreter_.interpret(input, cmd);
-    bulk_.push(cmd);
-    if(is_bulk_end) {
-      metrics_.push(std::this_thread::get_id(), bulk_, rows);
-      publish(bulk_);
-      bulk_.clear();
-      rows = 0;
-    }
-  }
-}
-
-void CmdProcessor::publish(const Bulk& bulk) {
-  for(auto& it: observers_) {
-    if(!it.expired()) {
-      auto p = it.lock();
-      p->write(bulk);
-    }
-  }
-}
-
-void CmdProcessor::print_metrics(std::ostream& os) {
-  os << metrics_;
-  for(auto& it: observers_) {
-    if(!it.expired()) {
-      auto p = it.lock();
-      os << p->get_metrics();
-    }
-  }
+void CmdProcessor::process(const async::handle_t& handle, const char* data, std::size_t size) {
+  std::unique_lock<std::mutex> lock(contexts_mutex_);
+  auto it = contexts_.find(handle);
+  if(it != contexts_.cend())
+    it->second->process(data, size);
 }
 
 } // namespace bulk.

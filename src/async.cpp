@@ -1,25 +1,15 @@
 #include "async.h"
-
 #include "CmdProcessor.h"
-#include "ConsoleWriter.h"
-#include "FileWriter.h"
-#include "ver.h"
-
-#include <iostream>
 
 namespace async {
 
-//bulk::CmdProcessor cmd_processor(static_cast<size_t>(bulk_size));
-
-//auto console_writer = std::make_shared<bulk::ConsoleWriter>();
-//auto file_writer = std::make_shared<bulk::FileWriter>();
 
 handle_t connect(std::size_t bulk_size) {
 
-  std::cout << "bulkmt version: "
-            << ver_major() << "."
-            << ver_minor() << "."
-            << ver_patch() << std::endl;
+//  std::cout << "bulkmt version: "
+//            << ver_major() << "."
+//            << ver_minor() << "."
+//            << ver_patch() << std::endl;
 
 //  if(argc < 2) {
 //    std::cerr << "Wrong number of arguments.\n" << std::endl;
@@ -32,32 +22,16 @@ handle_t connect(std::size_t bulk_size) {
 //    return EXIT_FAILURE;
 //  }
 
-//  bulk::CmdProcessor cmd_processor(static_cast<size_t>(bulk_size));
-
-//  auto console_writer = std::make_shared<bulk::ConsoleWriter>();
-//  auto file_writer = std::make_shared<bulk::FileWriter>();
-
-//  cmd_processor.subscribe(console_writer);
-//  cmd_processor.subscribe(file_writer);
-
-//  console_writer->start();
-//  file_writer->start();
-
-  return nullptr;
+  return bulk::CmdProcessor::get_instance().create_context(bulk_size);
 }
 
-void receive(handle_t handle, const char *data, std::size_t size) {
+void receive(handle_t handle, const char* data, std::size_t size) {
 //  cmd_processor.process(std::cin);
+  bulk::CmdProcessor::get_instance().process(handle, data, size);
 }
 
 void disconnect(handle_t handle) {
-//  console_writer->stop();
-//  file_writer->stop();
-
-//  cmd_processor.print_metrics(std::cout);
-
-//  cmd_processor.unsubscribe(console_writer);
-//  cmd_processor.unsubscribe(file_writer);
+  return bulk::CmdProcessor::get_instance().destroy_context(handle);
 }
 
 }
