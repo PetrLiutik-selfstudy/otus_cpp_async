@@ -6,6 +6,9 @@
 
 namespace bulk {
 
+/// Тип обозревателя.
+using observer_t = std::unique_ptr<IStreamWriter>;
+
 /**
  * @brief Интерфейс обозреваемого.
  */
@@ -17,13 +20,7 @@ class IObservable {
      * @brief Подписка на получение блоков команд на вывод.
      * @param observer - подписчик.
      */
-    virtual void subscribe(const std::shared_ptr<IStreamWriter>& observer) = 0;
-
-    /**
-     * @brief Отписка от получения блоков команд на вывод.
-     * @param observer - подписчик.
-     */
-    virtual void unsubscribe(const std::shared_ptr<IStreamWriter>& observer) = 0;
+    virtual void subscribe(observer_t observer) = 0;
 
     /**
      * @brief Публикация блока команд.

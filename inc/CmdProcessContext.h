@@ -29,31 +29,17 @@ class CmdProcessContext : public IObservable  {
      * @brief Подписка на получение блоков команд на вывод.
      * @param observer - подписчик.
      */
-    void subscribe(const std::shared_ptr<IStreamWriter>& observer) final;
-
-    /**
-     * @brief Отписка от получения блоков команд на вывод.
-     * @param observer - подписчик.
-     */
-    void unsubscribe(const std::shared_ptr<IStreamWriter>& observer) final;
+    void subscribe(observer_t observer) final;
 
     /**
      * @brief Обработка входной команды.
      * @param data - входной данные, содержащие команды.
      * @param size - размер входных данных.
+     * @param finish_bulk - принудительное завершение блока команд.
      */
-    void process(const char* data, std::size_t size);
-
-    /**
-     * @brief Вывод метрик в поток.
-     * @param os - выходной поток.
-     */
-    void print_metrics(std::ostream& os);
+    void process(const char* data, std::size_t size, bool finish_bulk = false);
 
   private:
-    /// Тип обозревателя.
-    using observer_t = std::weak_ptr<IStreamWriter>;
-
     /**
      * @brief Публикация блока команд.
      * @param bulk - блок команд.
