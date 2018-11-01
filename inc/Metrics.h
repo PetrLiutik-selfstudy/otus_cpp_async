@@ -28,6 +28,11 @@ class Metrics {
     void push(const std::thread::id& thread_id, const Bulk& bulk, size_t rows = 0);
 
     /**
+     * @brief Очистка метрик.
+     */
+    void clear();
+
+    /**
      * @brief Оператор вывода в поток блока команд.
      * @param os - поток вывода.
      * @param bulk - блок команд для вывода в поток.

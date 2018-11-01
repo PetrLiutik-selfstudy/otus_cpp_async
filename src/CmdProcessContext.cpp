@@ -14,7 +14,8 @@ void CmdProcessContext::subscribe(observer_t observer) {
 }
 
 void CmdProcessContext::process(const char* data, std::size_t size, bool finish_bulk) {
-  data_.append(data, size);
+  if(nullptr != data)
+    data_.append(data, size);
   size_t rows{};
   for(;;) {
     auto end_line = finish_bulk ? data_.size() : data_.find('\n');

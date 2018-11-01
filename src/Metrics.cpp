@@ -6,6 +6,10 @@ void Metrics::push(const std::thread::id& thread_id, const Bulk& bulk, size_t ro
   storage_[thread_id] += MetricsItem{rows, 1, bulk.size()};
 }
 
+void Metrics::clear() {
+  storage_.clear();
+}
+
 std::ostream& operator <<(std::ostream& os, const Metrics& metrics) {
   bool add_thread_num = metrics.storage_.size() > 1;
   size_t thread_num{1};
