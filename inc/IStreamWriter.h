@@ -18,9 +18,10 @@ class IStreamWriter {
 
     /**
      * @brief Запись блока команд в поток.
+     * @param context_id - id контекста из которого производится вывод.
      * @param bulk - блок команд.
      */
-    virtual void write(const Bulk& bulk) = 0;
+    virtual void write(uint8_t context_id, const Bulk& bulk) = 0;
 
     /**
      * @brief Дать метрики работы потоков.

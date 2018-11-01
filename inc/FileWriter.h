@@ -19,9 +19,10 @@ class FileWriter : public IStreamWriter, public ThreadPool<2> {
 
     /**
      * @brief Запись блока команд в поток.
+     * @param context_id - id контекста из которого производится вывод.
      * @param bulk - блок команд.
      */
-    void write(const Bulk& bulk) final;
+    void write(uint8_t context_id, const Bulk& bulk) final;
 
     /**
      * @brief Дать метрики работы потоков.

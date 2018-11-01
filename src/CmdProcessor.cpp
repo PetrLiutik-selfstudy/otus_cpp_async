@@ -4,8 +4,13 @@
 
 namespace bulk {
 
+CmdProcessor& CmdProcessor::get_instance() {
+  static CmdProcessor instance{};
+  return instance;
+}
+
 async::handle_t CmdProcessor::create_context(size_t bulk_size) {
-  auto context = std::make_shared<CmdProcessContext>(bulk_size);
+  auto context = std::make_shared<CmdProcessContext>(bulk_size, ++context_id_);
   auto handle = reinterpret_cast<async::handle_t>(context.get());
 
   auto console_writer = std::make_unique<bulk::ConsoleWriter>();

@@ -20,7 +20,8 @@ class CmdProcessContext : public IObservable  {
      * @brief Конструктор.
      * @param bulk_size - макисмальный размер блока команд.
      */
-    explicit CmdProcessContext(size_t bulk_size) : interpreter_{bulk_size}, metrics_{"main"} {
+    explicit CmdProcessContext(size_t bulk_size, uint8_t id) :
+      interpreter_{bulk_size}, metrics_{"main"}, id_{id} {
     }
 
     ~CmdProcessContext() override = default;
@@ -39,6 +40,12 @@ class CmdProcessContext : public IObservable  {
      */
     void process(const char* data, std::size_t size, bool finish_bulk = false);
 
+    /**
+     * @brief Вывод метрик в поток.
+     * @param os - выходной поток.
+     */
+    void print_metrics(std::ostream& os);
+
   private:
     /**
      * @brief Публикация блока команд.
@@ -55,8 +62,10 @@ class CmdProcessContext : public IObservable  {
     CmdInterpreter interpreter_;
     /// Метрики основного потока.
     Metrics metrics_;
-    /// Строка, содержащая данные со входными комнады.
+    /// Строка, содержащая данные со входными командами.
     std::string data_;
+    /// id контекста.
+    uint8_t id_;
 };
 
 } // namespace bulk.

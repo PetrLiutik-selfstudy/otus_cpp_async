@@ -5,7 +5,7 @@
 
 namespace bulk {
 
-void ConsoleWriter::write(const Bulk& bulk) {
+void ConsoleWriter::write(uint8_t, const Bulk& bulk) {
   add_job([this, bulk](){
     os_ << bulk;
 
