@@ -11,8 +11,7 @@ find_package (Threads REQUIRED)
 file(GLOB_RECURSE SOURCES *.cpp *.h)
 
 # Setup application
-#add_library(${PROJECT_NAME} SHARED ${SOURCES})
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
